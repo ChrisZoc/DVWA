@@ -1,14 +1,14 @@
 <?php
 
 if (array_key_exists ("redirect", $_GET) && $_GET['redirect'] != "") {
-	if ($_GET['redirect'] !== 'info.php') {
+	if ($_GET['redirect'] !== 'info.php?id=1' && $_GET['redirect'] !== 'info.php?id=2') {
 		http_response_code (500);
 		?>
 		<p>You can only redirect to the info page.</p>
 		<?php
 		exit;
 	} else {
-		header ('location: info.php');
+		header ('location: ' . $_GET['redirect']);
 		exit;
 	}
 }

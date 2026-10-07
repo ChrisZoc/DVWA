@@ -14,4 +14,6 @@ if( !in_array( $file, $configFileNames, true ) ) {
 	exit;
 }
 
+$file = DVWA_WEB_PAGE_TO_ROOT . 'vulnerabilities/fi/' . $file;
+
 ?>

@@ -14,7 +14,7 @@ if( isset( $_POST[ 'Submit' ]  ) ) {
 					$data = $db->prepare( 'SELECT first_name, last_name FROM users WHERE user_id = (:id) LIMIT 1;' );
 					$data->bindParam( ':id', $id, PDO::PARAM_INT );
 					$data->execute();
-					$exists = $data->rowCount() > 0;
+					$exists = $data->fetch() !== false;
 				} catch (Exception $e) {
 					print 'There was an error.';
 					exit;
