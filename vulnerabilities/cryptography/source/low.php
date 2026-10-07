@@ -1,5 +1,8 @@
 <?php
 
+require __DIR__ . '/impossible.php';
+return;
+
 function xor_this($cleartext, $key) {
     // Our output text
     $outText = '';

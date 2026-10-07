@@ -7,7 +7,7 @@ function decrypt ($ciphertext, $key) {
 	return $e;
 }
 
-$key = "ik ben een aardbei";
+$key = hash( 'sha256', session_id() . __FILE__, true );
 
 $errors = "";
 $success = "";

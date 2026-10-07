@@ -31,33 +31,30 @@ switch( dvwaSecurityLevelGet() ) {
 
 require_once DVWA_WEB_PAGE_TO_ROOT . "vulnerabilities/xss_d/source/{$vulnerabilityFile}";
 
-$default = $_GET['default'] ?? '';
-$allowedLanguages = array( 'English', 'French', 'Spanish', 'German' );
-if( !in_array( $default, $allowedLanguages, true ) ) {
-	$default = '';
-}
-
-$languageOptions = '';
-foreach( $allowedLanguages as $language ) {
-	$selected = $default === $language ? ' selected="selected"' : '';
-	$escapedLanguage = htmlspecialchars( $language, ENT_QUOTES, 'UTF-8' );
-	$languageOptions .= "<option value='{$escapedLanguage}'{$selected}>{$escapedLanguage}</option>";
-}
-
 $page[ 'body' ] = <<<EOF
 <div class="body_padded">
 	<h1>Vulnerability: DOM Based Cross Site Scripting (XSS)</h1>
 
 	<div class="vulnerable_code_area">
  
-		<p>Please choose a language:</p>
+ 		<p>Please choose a language:</p>
 
 		<form name="XSS" method="GET">
 			<select name="default">
-				{$languageOptions}
+				<option value="English">English</option>
+				<option value="French">French</option>
+				<option value="Spanish">Spanish</option>
+				<option value="German">German</option>
 			</select>
 			<input type="submit" value="Select" />
 		</form>
+		<script>
+			const language = new URLSearchParams(window.location.search).get('default');
+			const selector = document.querySelector('select[name="default"]');
+			if (['English', 'French', 'Spanish', 'German'].includes(language)) {
+				selector.value = language;
+			}
+		</script>
 	</div>
 EOF;
 

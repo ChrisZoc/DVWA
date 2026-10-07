@@ -13,8 +13,8 @@ $configFileNames = [
 
 if( !in_array($file, $configFileNames) ) {
     // This isn't the page we want!
-    echo "ERROR: File not found!";
-    exit;
+    $page[ 'body' ] .= "<p>ERROR: File not found!</p>";
+    $file = 'include.php';
 }
 
 ?>

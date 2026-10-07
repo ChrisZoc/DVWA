@@ -1,30 +1,22 @@
 <?php
 
-if( isset( $_POST[ 'Submit' ]  ) ) {
-	// Get input
-	$target = $_REQUEST[ 'ip' ];
+if( isset( $_POST[ 'Submit' ] ) ) {
+    $target = isset( $_POST[ 'ip' ] ) && is_string( $_POST[ 'ip' ] ) ? trim( $_POST[ 'ip' ] ) : '';
 
-	// Set blacklist
-	$substitutions = array(
-		'&&' => '',
-		';'  => '',
-	);
+    if( filter_var( $target, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) === false ) {
+        $html .= '<pre>ERROR: You have entered an invalid IP.</pre>';
+    }
+    else {
+        $address = escapeshellarg( $target );
+        if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+            $cmd = shell_exec( 'ping ' . $address );
+        }
+        else {
+            $cmd = shell_exec( 'ping -c 4 ' . $address );
+        }
 
-	// Remove any of the characters in the array (blacklist).
-	$target = str_replace( array_keys( $substitutions ), $substitutions, $target );
-
-	// Determine OS and execute the ping command.
-	if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
-		// Windows
-		$cmd = shell_exec( 'ping  ' . $target );
-	}
-	else {
-		// *nix
-		$cmd = shell_exec( 'ping  -c 4 ' . $target );
-	}
-
-	// Feedback for the end user
-	$html .= "<pre>{$cmd}</pre>";
+        $html .= '<pre>' . htmlspecialchars( $cmd ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' ) . '</pre>';
+    }
 }
 
 ?>

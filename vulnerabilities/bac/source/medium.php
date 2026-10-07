@@ -1,4 +1,6 @@
 <?php
+require __DIR__ . '/impossible.php';
+return;
 if (!defined('DVWA_WEB_PAGE_TO_ROOT')) {
     define('DVWA_WEB_PAGE_TO_ROOT', '../../../');
 }

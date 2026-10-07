@@ -1,19 +1,13 @@
 <?php
 
-$file = $_GET[ 'page' ];
+require __DIR__ . '/impossible.php';
+return;
 
-$configFileNames = [
-	'include.php',
-	'file1.php',
-	'file2.php',
-	'file3.php',
-];
-
-if( !in_array( $file, $configFileNames, true ) ) {
-	echo 'ERROR: File not found!';
-	exit;
+// The page we wish to display
+$file = $_GET[ 'page' ] ?? '';
+if( !is_string( $file ) || !in_array( $file, array( 'include.php', 'file1.php', 'file2.php', 'file3.php' ), true ) ) {
+	http_response_code( 404 );
+	exit( 'ERROR: File not found!' );
 }
-
-$file = DVWA_WEB_PAGE_TO_ROOT . 'vulnerabilities/fi/' . $file;
 
 ?>

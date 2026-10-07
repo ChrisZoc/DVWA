@@ -1,5 +1,8 @@
 <?php
 
+require __DIR__ . '/impossible.php';
+return;
+
 require ("token_library_high.php");
 
 $message = "";

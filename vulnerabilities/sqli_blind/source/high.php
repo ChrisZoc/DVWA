@@ -2,48 +2,54 @@
 
 if( isset( $_COOKIE[ 'id' ] ) ) {
 	// Get input
-	$id = $_COOKIE[ 'id' ];
+	$id = filter_var( $_COOKIE[ 'id' ], FILTER_VALIDATE_INT, array( 'options' => array( 'min_range' => 1 ) ) );
+	if( $id === false ) { $id = 0; }
 	$exists = false;
 
-	if( is_numeric( $id ) ) {
-		$id = intval( $id );
+	switch ($_DVWA['SQLI_DB']) {
+		case MYSQL:
+			// Check database
+			$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id' LIMIT 1;";
+			try {
+				$result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ); // Removed 'or die' to suppress mysql errors
+			} catch (Exception $e) {
+				$result = false;
+			}
 
-		switch ($_DVWA['SQLI_DB']) {
-			case MYSQL:
+			$exists = false;
+			if ($result !== false) {
+				// Get results
 				try {
-					$data = $db->prepare( 'SELECT first_name, last_name FROM users WHERE user_id = (:id) LIMIT 1;' );
-					$data->bindParam( ':id', $id, PDO::PARAM_INT );
-					$data->execute();
-					$exists = $data->fetch() !== false;
-				} catch (Exception $e) {
-					$exists = false;
-				}
-				break;
-			case SQLITE:
-				global $sqlite_db_connection;
-
-				try {
-					$stmt = $sqlite_db_connection->prepare( 'SELECT COUNT(first_name) AS numrows FROM users WHERE user_id = :id LIMIT 1;' );
-					$stmt->bindValue( ':id', $id, SQLITE3_INTEGER );
-					$results = $stmt->execute();
-					$row = $results->fetchArray();
-					$exists = $row !== false && $row[ 'numrows' ] == 1;
+					$exists = (mysqli_num_rows( $result ) > 0); // The '@' character suppresses errors
 				} catch(Exception $e) {
 					$exists = false;
 				}
-				break;
-		}
+			}
+
+			((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+			break;
+		case SQLITE:
+			global $sqlite_db_connection;
+
+			$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id' LIMIT 1;";
+			try {
+				$results = $sqlite_db_connection->query($query);
+				$row = $results->fetchArray();
+				$exists = $row !== false;
+			} catch(Exception $e) {
+				$exists = false;
+			}
+
+			break;
 	}
 
 	if ($exists) {
+		// Feedback for end user
 		$html .= '<pre>User ID exists in the database.</pre>';
 	}
 	else {
-		if( rand( 0, 5 ) == 3 ) {
-			sleep( rand( 2, 4 ) );
-		}
-
-		header( $_SERVER[ 'SERVER_PROTOCOL' ] . ' 404 Not Found' );
+		// User wasn't found, so the page wasn't!
+		// Feedback for end user
 		$html .= '<pre>User ID is MISSING from the database.</pre>';
 	}
 }
