@@ -1,5 +1,7 @@
 <?php
 
+// Shared secure handler for all CSRF difficulty levels.
+
 if( isset( $_POST['Change'] ) ) {
 	checkToken( $_POST['user_token'] ?? '', $_SESSION['session_token'] ?? '', 'index.php' );
 	$pass_curr = $_POST['password_current'] ?? '';
