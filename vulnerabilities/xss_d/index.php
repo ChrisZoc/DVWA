@@ -31,10 +31,17 @@ switch( dvwaSecurityLevelGet() ) {
 
 require_once DVWA_WEB_PAGE_TO_ROOT . "vulnerabilities/xss_d/source/{$vulnerabilityFile}";
 
-# For the impossible level, don't decode the querystring
-$decodeURI = "decodeURI";
-if ($vulnerabilityFile == 'impossible.php') {
-	$decodeURI = "";
+$default = $_GET['default'] ?? '';
+$allowedLanguages = array( 'English', 'French', 'Spanish', 'German' );
+if( !in_array( $default, $allowedLanguages, true ) ) {
+	$default = '';
+}
+
+$languageOptions = '';
+foreach( $allowedLanguages as $language ) {
+	$selected = $default === $language ? ' selected="selected"' : '';
+	$escapedLanguage = htmlspecialchars( $language, ENT_QUOTES, 'UTF-8' );
+	$languageOptions .= "<option value='{$escapedLanguage}'{$selected}>{$escapedLanguage}</option>";
 }
 
 $page[ 'body' ] = <<<EOF
@@ -43,22 +50,11 @@ $page[ 'body' ] = <<<EOF
 
 	<div class="vulnerable_code_area">
  
- 		<p>Please choose a language:</p>
+		<p>Please choose a language:</p>
 
 		<form name="XSS" method="GET">
 			<select name="default">
-				<script>
-					if (document.location.href.indexOf("default=") >= 0) {
-						var lang = document.location.href.substring(document.location.href.indexOf("default=")+8);
-						document.write("<option value='" + lang + "'>" + $decodeURI(lang) + "</option>");
-						document.write("<option value='' disabled='disabled'>----</option>");
-					}
-					    
-					document.write("<option value='English'>English</option>");
-					document.write("<option value='French'>French</option>");
-					document.write("<option value='Spanish'>Spanish</option>");
-					document.write("<option value='German'>German</option>");
-				</script>
+				{$languageOptions}
 			</select>
 			<input type="submit" value="Select" />
 		</form>
